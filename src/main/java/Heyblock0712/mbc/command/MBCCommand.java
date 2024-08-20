@@ -1,5 +1,6 @@
 package Heyblock0712.mbc.command;
 
+import Heyblock0712.mbc.MBC;
 import Heyblock0712.mbc.utils.Title;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
@@ -27,37 +28,13 @@ public class MBCCommand extends Command implements TabExecutor {
         }
 
         if (strings.length < 1) {
-            message = new TextComponent("幫助指令一覽: ");
-            message.setColor(ChatColor.GOLD);
-            message.addExtra("\n");
-
-            Iterator<CommandOption> iterator = CommandManager.getCommandOptionMBC().values().iterator();
-            while (iterator.hasNext()) {
-                CommandOption option = iterator.next();
-
-                TextComponent Name = new TextComponent(option.getName());
-                Name.setColor(ChatColor.WHITE);
-
-                TextComponent Divider = new TextComponent(" - ");
-                Divider.setColor(ChatColor.DARK_GRAY);
-
-                TextComponent Description = new TextComponent(option.getDescription());
-                Description.setColor(ChatColor.GRAY);
-
-                message.addExtra(Name);
-                message.addExtra(Divider);
-                message.addExtra(Description);
-
-                if (iterator.hasNext()) {
-                    message.addExtra("\n");
-                }
-            }
+            message = buildCommandOptionsMessage(getName(), MBC.getCommandManager().getCommandOptionMBC().values().iterator());
             commandSender.sendMessage(message);
             return;
         }
 
         String Option = strings[0];
-        CommandOption commandOption = CommandManager.getCommandOptionMBC(Option);
+        CommandOption commandOption = MBC.getCommandManager().getCommandOptionMBC(Option);
         if (commandOption == null) {
             message = new TextComponent("沒有這指令");
             message.setColor(ChatColor.RED);
@@ -82,10 +59,10 @@ public class MBCCommand extends Command implements TabExecutor {
 
         if (strings.length == 1) {
             String currentInput = strings[0].toLowerCase();
-            List<String> allOptions = CommandManager.getCommandOptionMBCName();
+            List<String> allOptions = MBC.getCommandManager().getCommandOptionMBCName();
 
             for (String optionName : allOptions) {
-                CommandOption option = CommandManager.getCommandOptionMBC(optionName);
+                CommandOption option = MBC.getCommandManager().getCommandOptionMBC(optionName);
 
                 // 權限判定
                 if (option.getPermission() != null && !commandSender.hasPermission(option.getPermission())) continue;
@@ -99,9 +76,40 @@ public class MBCCommand extends Command implements TabExecutor {
         }
 
         String Option = strings[0];
-        CommandOption commandOption = CommandManager.getCommandOptionMBC(Option);
-        if (commandOption == null) {return tabComplete;}
+        CommandOption commandOption = MBC.getCommandManager().getCommandOptionMBC(Option);
+        if (commandOption == null) {
+            return tabComplete;
+        }
 
         return commandOption.onTabComplete(commandSender, strings);
+    }
+
+    public static TextComponent buildCommandOptionsMessage(String name, Iterator<CommandOption> iterator) {
+        TextComponent message = new TextComponent(name + " 幫助指令一覽: ");
+        message.setColor(ChatColor.GOLD);
+        message.addExtra("\n");
+
+        while (iterator.hasNext()) {
+            CommandOption option = iterator.next();
+
+            TextComponent Name = new TextComponent(option.getName());
+            Name.setColor(ChatColor.WHITE);
+
+            TextComponent Divider = new TextComponent(" - ");
+            Divider.setColor(ChatColor.DARK_GRAY);
+
+            TextComponent Description = new TextComponent(option.getDescription());
+            Description.setColor(ChatColor.GRAY);
+
+            message.addExtra(Name);
+            message.addExtra(Divider);
+            message.addExtra(Description);
+
+            if (iterator.hasNext()) {
+                message.addExtra("\n");
+            }
+        }
+
+        return message;
     }
 }

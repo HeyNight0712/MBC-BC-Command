@@ -5,17 +5,24 @@ import Heyblock0712.mbc.command.MBCCommand;
 import net.md_5.bungee.api.plugin.Plugin;
 
 public final class MBC extends Plugin {
+    private static MBC instance;
+    private static CommandManager commandManager;
 
     @Override
     public void onEnable() {
-        // Plugin startup logic
+        instance = this;
         getProxy().getPluginManager().registerCommand(this, new MBCCommand());
 
-        CommandManager.putCommandOption(new TestCommand());
+        commandManager = new CommandManager();
+
+
     }
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+        instance = null;
     }
+
+    public static MBC getInstance() {return instance;}
+    public static CommandManager getCommandManager() {return commandManager;}
 }
